@@ -105,11 +105,11 @@ function OrdersScreen({navigation}) {
             </View>
             {authContext.userDetails.isDriver === true && <View style = {styles.options}>
               <View style={{backgroundColor: pending?colors.black:colors.light, padding: 5, borderRadius: 100, paddingHorizontal:10}} >
-                <TouchableHighlight onPress={()=>{setAccept(false), setDispatch(false), setPending(true), forceUpdate()}}>
+                <TouchableHighlight onPress={()=>{setAccept(false),  setPending(true), forceUpdate()}}>
                   <AppText style={{color: pending?colors.white:colors.black}} >Pending</AppText></TouchableHighlight></View>
 
               <View style={{backgroundColor: accept?colors.black:colors.light, padding: 5, borderRadius: 100, paddingHorizontal:8}} >
-                <TouchableHighlight onPress={()=>{setAccept(true), setDispatch(false), setPending(false), forceUpdate()}}>
+                <TouchableHighlight onPress={()=>{setAccept(true), setPending(false), forceUpdate()}}>
                   <AppText style={{color: accept?colors.white:colors.black}} >Accepted</AppText></TouchableHighlight></View>
 
               

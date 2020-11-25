@@ -31,6 +31,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
  import * as firebase from "firebase"
  import 'firebase/firestore';
 import { color } from 'react-native-reanimated';
+import storage from '../../config/storage';
 export function DrawerContent(props) {
 
     //const paperTheme = useTheme();
@@ -133,7 +134,7 @@ export function DrawerContent(props) {
                         />
                     )}
                     label="Sign Out"
-                     onPress={() => firebase.auth().signOut()}
+                     onPress={() => {authContext.setUserDetails(null),storage.removeToken(),firebase.auth().signOut()}}
                 />
             </Drawer.Section>
         </View>

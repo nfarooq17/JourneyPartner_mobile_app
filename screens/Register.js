@@ -4,7 +4,7 @@ import * as Yup from "yup";
 import * as firebase from "firebase"
 import 'firebase/firestore';
 import colors from '../config/colors';
-import authStorage from '../config/storage'
+import Storage from '../config/storage'
 import AuthContext from "../config/context";
 
 import Screen from "../components/Screen";
@@ -34,11 +34,10 @@ const validationSchema = Yup.object().shape({
 
 });
 
-function Register() {
+function Register({navigation}) {
   
   const [imageUri,setImageUri]=useState()
-  const authContext = useContext(AuthContext)
-  const [isEnabled, setIsEnabled] = useState(authContext.userDetails.isDriver)
+  const [isEnabled, setIsEnabled] = useState(false)
   
   const toggleSwitch = () => setIsEnabled(previousState => !previousState);
   async function uploadImageAsync(uri, values) {
@@ -58,7 +57,7 @@ function Register() {
   
     const ref = firebase
       .storage()
-      .ref().child("profileImage"+authContext.userDetails.uid)
+      .ref().child("profileImage"+ await firebase.auth().currentUser.uid)
   
     const snapshot = await ref.put(blob);
   
@@ -79,11 +78,19 @@ function Register() {
     await firebase.auth().createUserWithEmailAndPassword(values.email, values.password).catch(error => Alert.alert(error.message,"",[
       {text: 'Okay'},
   ]))
+  let user = firebase.auth().currentUser
+  user.sendEmailVerification().then(function() {
+    alert("Email Sent")
+  }).catch(function(error) {
+    alert(error.message)
+  });
     values.uid = firebase.auth().currentUser.uid
     values.isDriver = isEnabled
     
     console.log(values)
-    const image = await uploadImageAsync(values.image, values)
+    navigation.goBack();
+    const image = await uploadImageAsync(values.image[0], values)
+    console.log("hogya")
     values.image = image
     const userRef =firebase.firestore().collection("user")
     const snapshot = await userRef.where('email', '==', values.email ).get()
@@ -105,7 +112,7 @@ function Register() {
 
         
       <Form
-        initialValues={{ name: "", email: "", password: "", VehicleNo: "", contact: "", cnic:"" , image:'', LicesneNo:""}}
+        initialValues={{ name: "", email: "", password: "", VehicleNo: "", contact: "", cnic:"" , image:[], LicesneNo:""}}
         onSubmit={(values) => handleSubmit(values)}
         validationSchema={validationSchema}
         >

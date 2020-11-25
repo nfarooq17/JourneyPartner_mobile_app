@@ -32,8 +32,8 @@ function RideDetails({route, navigation}) {
         <Screen>
             <View style = {styles.container}>
                 <AppText style = {styles.titleheader}>{items.data.name}</AppText>
-                <AppText>{items.data.from}</AppText>
-                <AppText>Address: {items.data.address}</AppText>
+                <AppText>from: {items.data.from}</AppText>
+                <AppText>Address: {items.data.where}</AppText>
 
             </View>
             <FlatList
@@ -44,7 +44,7 @@ function RideDetails({route, navigation}) {
                     <View style={{flex: 1}}>
                         <ListItem
                             title={item.data.name}
-                            subTitle={item.data.price}
+                            subTitle={item.data.from}
                             onPress={() => console.log("Message selected")}
                 /></View>
                 </View>

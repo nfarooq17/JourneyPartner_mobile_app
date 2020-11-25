@@ -198,23 +198,7 @@ function DriverDetails({route}) {
           
       ItemSeparatorComponent={ListItemSeparator}
     />
-   <Modal visible={checkOutmodalVisible} animationType="slide">
-      <Screen>
-      <FlatList
-      data={order}
-      keyExtractor={(order) => order.id.toString()}
-      renderItem={({ item }) => (
-        <ListItem
-          title={item.data.title}
-          subTitle = {("Price of One is Rs."+item.data.price+" You currently have "+item.data.count+" in cart").toString()}
-        />
-      )}
-      ItemSeparatorComponent={ListItemSeparator}
-      >  
-      </FlatList>
-       
-      </Screen>
-    </Modal>
+  
     </Screen>
     </>
     

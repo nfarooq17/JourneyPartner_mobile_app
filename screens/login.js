@@ -22,10 +22,10 @@ import {
 } from "react-native";
 import AppButton from "../components/AppButton";
 import ErrorAlert from '../components/errorAlert';
-import Forgotpassword1 from './forgotpassword1';
 import { NavigationContainer } from "@react-navigation/native";
 import AuthContext from "../config/context";
 import { AppForm, SubmitButton } from "../components/forms";
+import colors from '../config/colors';
 
 
 export default function login({navigation}) {
@@ -41,9 +41,19 @@ export default function login({navigation}) {
 
   const loginUser = async ({email, password}) => {
     firebase.auth().signInWithEmailAndPassword(email, password).catch(error => alert(error))
+    const f = firebase.auth().currentUser.reload();
+    if(firebase.auth().currentUser.emailVerified === false){
+      alert("Email Not Verified, Check Your Mail Please")
+      return
+    }
+    else {
+      alert("Ok")
+    }
     const userRef = firebase.firestore().collection("user")
     const snapshot = await userRef.where('email', '==', email ).get()
     
+    console.log("Process")
+
     if (snapshot.empty) {
       console.log('No matching documents.');
       return;
@@ -158,6 +168,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
     alignItems: "center",
+    backgroundColor: colors.light
   },
   img: {
     marginTop: 50,

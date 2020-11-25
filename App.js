@@ -29,7 +29,6 @@ import {
   LogBox,
 } from "react-native";
 /*import PreLogin from "./screens/preLogin";
-import forgotpassword1 from "./screens/forgotpassword1";
 import forgotpassword2 from "./screens/forgotpassword2";
 import newPassword from "./screens/newPassword";
 import Psignup from './screens/psignup';
@@ -54,7 +53,7 @@ import Profile from "./screens/EditProfile";
 import TabBar from "./screens/Navigation/TabBar";
 import RouteNavigation from './screens/Navigation/RouteNavigation';
 
-LogBox.ignoreLogs(['Setting a timer'])
+LogBox.ignoreAllLogs();
 
 const firebaseConfig = {
   apiKey: "AIzaSyCQNqyZgj-O5ViMIJlYrE1CWJ23SFcv_TU",
@@ -112,7 +111,7 @@ export default function app() {
    <NavigationContainer>
       
     
-    {user? <MyStack/>  :<NavigationAuth/>}
+    {userDetails? <MyStack/>  :<NavigationAuth/>}
 
      
    </NavigationContainer>
