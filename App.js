@@ -111,7 +111,7 @@ export default function app() {
    <NavigationContainer ref ={navigationRef}>
       
      {userDetails? <AppNavigator/>  :<NavigationAuth/>}  
-    
+  
    {/* <MapScreen /> */}
    </NavigationContainer>
    </AuthContext.Provider>
