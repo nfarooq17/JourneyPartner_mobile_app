@@ -24,8 +24,8 @@ function AppPicker({ icon, items, onSelectItem, placeholder, selectedItem }) {
           {icon && (
             <MaterialCommunityIcons
               name={icon}
-              size={20}
-              color={defaultStyles.colors.medium}
+              size={5}
+              color={defaultStyles.colors.black}
               style={styles.icon}
             />
           )}
@@ -67,21 +67,26 @@ function AppPicker({ icon, items, onSelectItem, placeholder, selectedItem }) {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: defaultStyles.colors.light,
-    borderRadius: 25,
+    borderRadius: 13,
+    borderColor: 'black',
+    borderWidth: 1,
     flexDirection: "row",
-    width: "100%",
+    width: "90%",
     padding: 15,
     marginVertical: 10,
+    marginLeft: 20,
   },
   icon: {
     marginRight: 10,
   },
   placeholder: {
-    color: defaultStyles.colors.medium,
+    color: defaultStyles.colors.black,
     flex: 1,
   },
   text: {
     flex: 1,
+    
+ 
   },
 });
 

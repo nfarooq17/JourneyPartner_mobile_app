@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useContext } from "react";
+import { Rating } from "react-native-ratings";
 import {
   View,
   StyleSheet,
@@ -12,51 +13,65 @@ import {MaterialCommunityIcons} from "@expo/vector-icons"
 
 import colors from "../../config/colors";
 
+import AuthContext from "../../config/context";
+
 
 function ListItem({
   title,
+  title1,
   subTitle,
   subTitle1,
+  subTitle2,
+  contact,
+  vehicleNo,
   image,
   IconComponent,
   onPress,
-  renderRightActions,
-  renderLeftActions,
   style,
-  badge=false,
-  count = 0,
   imageStyle,
   chevron,
   settingIcon,
-  onSettingPress
+  onSettingPress,
+  stars,
+  isAccepted
 }) {
+  const authContext = useContext(AuthContext)
   return (
-    <Swipeable renderRightActions={renderRightActions} renderLeftActions={renderLeftActions} friction={2}  >
+   
       <TouchableHighlight underlayColor={colors.light} onPress={onPress}>
         <View style={[styles.container, style]}>
           {IconComponent}
           {image && <Image style={[styles.image,imageStyle]}source= {{uri: image}} />}
           <View style={[styles.detailsContainer]}>
-            <AppText style={styles.title} numberOfLines ={1}>{title}</AppText>
+           {/* {isAccepted && <AppText style={{marginLeft:250}}>Status: Accepted</AppText>}
+           {isAccepted &&  {!isAccepted &&<AppText style={{marginLeft:250}}>Status: Pending</AppText>}} */}
+           {!authContext.userDetails.isDriver&& <AppText style={styles.title} numberOfLines ={1}>{title}</AppText>}
+            {authContext.userDetails.isDriver &&<AppText style={styles.title} numberOfLines ={1}>{title1}</AppText>}
+            {contact&&<AppText style={styles.title} numberOfLines ={1}>Contact: {contact}</AppText>}
+            {vehicleNo&&<AppText style={styles.title} numberOfLines ={1}>Vehicle No: {vehicleNo}</AppText>}
+           
             {subTitle && <AppText style={styles.subTitle} numberOfLines ={2}>{subTitle}</AppText>}
-            {subTitle1 && <AppText style={styles.subTitle} numberOfLines ={2}>{subTitle1}</AppText>}
+            {subTitle1&& <AppText style={styles.subTitle} numberOfLines ={2}>{subTitle1}</AppText>}
+           {subTitle2&& <AppText style={styles.subTitle} numberOfLines ={2}>{subTitle2}</AppText>}
+            {stars && <AppText>
 
-          </View>
-          {count>0 && <AppText>In Cart: {count}</AppText>}
-          {chevron && <MaterialCommunityIcons color={colors.medium} name = "chevron-right" size= {25}></MaterialCommunityIcons>}
-          {settingIcon && <MaterialCommunityIcons onPress={onSettingPress} color={colors.primary} name = "lead-pencil" size= {25}></MaterialCommunityIcons>}
-          {badge &&
-          <View style={{backgroundColor: colors.primary, alignItems: "center", }}>
-            <AppText style={{color:colors.white}}>5</AppText>
-          <MaterialCommunityIcons color={colors.light} name = "cart-outline" size= {25}></MaterialCommunityIcons>
-          </View>
-          }
-          
+            <Rating
+            startingValue = {stars}
+            fractions = {1}
+            imageSize ={20}
+            readonly ={true}
+            /> {Math.round((stars + Number.EPSILON) * 100) / 100}
+            </AppText> } 
+
+
+
+          </View>  
         </View>
       </TouchableHighlight>
-    </Swipeable>
+    
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {

@@ -1,58 +1,72 @@
 import React, { useContext, useEffect, useState } from 'react';
 import MapView, { Callout, Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import { StyleSheet, Text, View, Dimensions, Image } from 'react-native';
-import getLocation from '../hooks/getLocation';
 import AuthContext from '../config/context';
 import colors from '../config/colors';
 import * as firebase from "firebase"
 import 'firebase/firestore';
+import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
+import getLocation from '../config/getLocation';
+import * as Location from 'expo-location'
+import AppButton from '../components/AppButton';
+
+
 
 function MapScreen({navigation,goToFeed, canDrag = false, data, ...otherProps}) {
 let location = getLocation()
-const [current,setCurrent] = useState()
+const [listing,setListing] = useState()
 async function loadLocation(){
-   
+   location = getLocation()
 }
 
 const authContext = useContext(AuthContext)
 
-async function postCheckIn(rname, rAL) {
+async function handleEndRide() {
+    console.log(authContext.userDetails.name)
+    const postRef = await firebase.firestore().collection('ride').where('owener','==',authContext.userDetails.docId).get()
+    setListing(postRef.docs.map((doc)=>({data: doc.data()})))
+    console.log("values1")
+    
     let values = {
         time: firebase.firestore.FieldValue.serverTimestamp(),
-        description: "Enjoying the food at "+rname,
-        images: [],
-        isCheckIn : true,
-        addressLocation: rAL,
-        name: authContext.userDetails.name,
-        userDocId: authContext.userDetails.docId,
+        addressLocation: location,
+        dname: authContext.userDetails.name,
+        owener: authContext.userDetails.docId,
+        
     }
-    await firebase.firestore().collection('posts').add(values)
+    console.log(values)
+
+    firebase.firestore().collection('trips').add(values)
+    console.log("values")
+
 }
 
 useEffect(()=>{
-   
-},[location])
+   loadLocation()
+})
+
 
 
 
 
     return (
     <View style={styles.container}>
+
         <MapView style={styles.mapStyle}
+
                 region={{
                     latitude: location ? location.latitude : 30.3753,
                     longitude: location ? location.longitude : 69.3451,
                     latitudeDelta:  location ? 0.01:4,
                     longitudeDelta: location ? 0.01:4
                 }}
-                
-                
-        
+
         >
             <Marker
             pinColor = {colors.secondary}
                 style ={{borderColor: colors.secondary}}
                 draggable ={canDrag}
+                
                 onDragEnd={(value)=>{
                     location = value.nativeEvent.coordinate,
                     console.log(location)
@@ -61,28 +75,11 @@ useEffect(()=>{
                 title = "You"
              >
              </Marker>
-            {
-                data?.map(marker => (
-                    <Marker
-                    pinColor = {colors.primary}
-                    tracksInfoWindowChanges
-                    key = {marker.id}
-                    coordinate = {{
-                        longitude: marker.data.addressLocation.longitude,
-                        latitude: marker.data.addressLocation.latitude,
-                        longitudeDelta: 0.001,
-                        latitudeDelta: 0.001
-                    }}
-                    title = {marker.data.name}
-                    onPress = {()=>{postCheckIn(marker.data.name, marker.data.addressLocation), goToFeed()}}
-                    >
-                        
-                    </Marker>
-                ))
-            }
+        
             
             
             </MapView>
+            <AppButton title='end Ride' onPress={()=>handleEndRide()}/>
     </View>
     );
 }
@@ -96,7 +93,7 @@ const styles = StyleSheet.create({
     },
     mapStyle: {
       width: Dimensions.get('window').width,
-      height: Dimensions.get('window').height*.5
+      height: Dimensions.get('window').height-80,
     },
   });
 

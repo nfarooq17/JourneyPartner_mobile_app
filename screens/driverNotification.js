@@ -22,7 +22,8 @@ export default function DriverDashboard({navigation}) {
       />
             <View style={styles.btn}>
 
-           <AppButton disabled={!authContext.userDetails.isApproved} title="Create Route" onPress = {() => navigation.navigate('createRoute')}/>
+             
+             <AppText style={styles.btn}>Check your email for verification</AppText>
             
             </View>
         </View>
@@ -37,7 +38,6 @@ const styles = StyleSheet.create({
       },
       btn:{
         marginTop:-10,
-        width:'100%',
         marginLeft:220
       },
       img: {

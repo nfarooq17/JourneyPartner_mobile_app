@@ -16,7 +16,7 @@ import AuthContext from '../config/context';
 
 
 
-function myRide({navigation}) {
+function OrdersScreen({navigation}) {
   const [loading,isLoading]=useState(false)
   const authContext = useContext(AuthContext)
   const [pending, setPending] = useState(true)
@@ -29,31 +29,10 @@ function myRide({navigation}) {
     setMessages(null)
     isLoading(true)
     const postRef = await firebase.firestore().collection("ride").where("owener","==",authContext.userDetails.docId).get()
+    setMessages(postRef.docs.map((doc)=>({id: doc.id, data: doc.data()})))
     let data = []
-
-    if(accept){
-    postRef.forEach(doc => {
-      if(doc.data().isAccepted === true)
-        data.push({id: doc.id, data: doc.data()})
-      })
-      
-      setMessages(data)
-      isLoading(false)
-      return
-    }
     
-    else if(pending){
-    postRef.forEach(doc => {
-      if(doc.data().isAccepted === false)
-        data.push({id: doc.id, data: doc.data()})
-
-      })
-
-      setMessages(data)
-      isLoading(false)
-
-      return
-    }
+    // setMessages(postRef.docs.map((doc)=>({id: doc.id, data: doc.data()})))
     isLoading(false)
 
   }
@@ -79,7 +58,9 @@ function myRide({navigation}) {
             else {
               loadROrdersData();
             }
-          } 
+          } else {
+            // it's empty
+          }
         })
     return () => {
         unsubscribe()
@@ -120,8 +101,6 @@ function myRide({navigation}) {
                     title1={item.data.name}
                     subTitle={item.data.from.label}
                     subTitle1={item.data.where.label}
-                    isAccepted={item.data.isAccepted}
-                    
                     onPress={() => navigation.navigate("Ride Details", item)}
 
                     />
@@ -162,4 +141,4 @@ const styles = StyleSheet.create({
 })
 
 
-export default myRide;
+export default OrdersScreen;

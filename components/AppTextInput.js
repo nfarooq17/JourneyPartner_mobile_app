@@ -28,15 +28,22 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: defaultStyles.colors.light,
     flexDirection: "row",
-    width: "80%",
-    padding: 10,
+    width: "90%",
+    paddingTop: 13,
+    paddingRight: 10,
+    paddingLeft:10,
+    marginHorizontal: 20,
+    
     marginVertical: 5,
-    borderTopColor: 'transparent',
-    borderBottomColor:'black',
-    borderBottomWidth:2,
+    borderColor:'#666',
+    borderWidth:1,
+    borderRadius: 15,
+    shadowColor: '#666',
+    paddingBottom:10
   },
   icon: {
-    marginRight: 10,
+    paddingTop:3,
+    paddingLeft: 0,
   },
 });
 

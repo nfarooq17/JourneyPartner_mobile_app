@@ -12,7 +12,26 @@ import 'firebase/firestore';
 import AuthContext from '../config/context';
 
 
-
+async function sendPushNotification(nToken, title ) {
+    const message = {
+      to: nToken,
+      sound: 'default',
+      title: title,
+      data: { _displayInForeground : true },
+    };
+  
+    await fetch('https://exp.host/--/api/v2/push/send', {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Accept-encoding': 'gzip, deflate',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(message),
+    });
+  
+  }
+  
 
 function RideDetails({route, navigation}) {
     const items = route.params;
@@ -20,20 +39,36 @@ function RideDetails({route, navigation}) {
 
     const acceptRide = async () => {
         await firebase.firestore().collection('ride').doc(items.id).update({isAccepted: true})
+        const user = await firebase.firestore().collection('user').doc(item.data.pId).get()
+        const token = user.data().nToken
+        sendPushNotification(token, authContext.userDetails.name + "Has accepted your request")
         navigation.goBack();
     }
     const rejectRide = async () => {
         await firebase.firestore().collection('ride').doc(items.id).delete();
+        const user = await firebase.firestore().collection('user').doc(item.data.pId).get()
+        const token = user.data().nToken
+        sendPushNotification(token, authContext.userDetails.name + "Has rejected your request")
         navigation.goBack();
+    }
+    function getDate(time){
+        console.log(time)
+        let date = new Date(time*1000)
+    
+        return date.toLocaleDateString() 
     }
 
     return (
 
         <Screen>
             <View style = {styles.container}>
-                <AppText style = {styles.titleheader}>{items.data.name}</AppText>
-                <AppText>from: {items.data.from}</AppText>
-                <AppText>Address: {items.data.where}</AppText>
+               {authContext.userDetails.isDriver && <AppText style = {styles.titleheader}>{items.data.name} Requested a ride</AppText>}
+               {!authContext.userDetails.isDriver && <AppText style = {styles.titleheader}>{items.data.dName}</AppText>}
+               
+                <AppText>from: {items.data.from.label}</AppText>
+                <AppText>where: {items.data.where.label}</AppText>
+                <AppText>Date: {getDate(items.data.date.seconds)} </AppText>
+    <AppText>Status:{items.data.isAccepted&&<AppText>Accepted</AppText>}{!items.data.isAccepted&&<AppText>Pending</AppText>}</AppText>
 
             </View>
             <FlatList
@@ -44,7 +79,7 @@ function RideDetails({route, navigation}) {
                     <View style={{flex: 1}}>
                         <ListItem
                             title={item.data.name}
-                            subTitle={item.data.from}
+                            subTitle={item.data.from.label}
                             onPress={() => console.log("Message selected")}
                 /></View>
                 </View>
@@ -54,9 +89,11 @@ function RideDetails({route, navigation}) {
              />
              
              {(authContext.userDetails.isDriver === true && items.data.isAccepted===false) && <View style ={{padding: 20}}>
+                <View style={{right:-200}}>
 
                  <AppButton title ="Accept Ride" onPress={()=>acceptRide()}></AppButton>
                  <AppButton style={{backgroundColor:'red'}} title ="Reject Ride" onPress={() => rejectRide()}></AppButton>
+                </View>
                  
                  </View>}
         </Screen>

@@ -11,6 +11,7 @@ import colors from "../config/colors";
 import AuthContext from '../config/context';
 import AppTextInput from "../components/AppTextInput";
 import { TouchableHighlight, TouchableOpacity } from "react-native-gesture-handler";
+import { getAsync } from "expo-permissions";
 
 
 function PassengerDashboard({navigation}) {
@@ -18,6 +19,39 @@ function PassengerDashboard({navigation}) {
   const [searchText, setSearchText] = useState("");
   const authContext = useContext(AuthContext);
   const [loading,isLoading]=useState(false);
+  const [rate , setRate] = useState();
+  const [reviewData,setReviewData] = useState([])
+  const [rAvg,setRAvg] = useState()
+
+  let avg= 0;
+
+  async function loadReviewData() {
+    avg=0
+    const postRef = await firebase.firestore().collection("reviews").get()
+    setReviewData(postRef.docs.map((doc)=>({id: doc.id, data: doc.data()})))
+    
+    
+  }
+
+  async function calAvg(id){
+    let t= 0
+    let n = 0
+    avg = 0
+   reviewData.forEach(item => {
+     if(item.data.owener === id){
+      
+       
+          t=t+item.data.rating
+          n=n+1
+        
+       
+      }
+     
+   })
+   avg = t/n
+   console.log(avg)
+   return avg
+  }
 
   const textInput = React.useRef();
 
@@ -25,19 +59,24 @@ function PassengerDashboard({navigation}) {
 
   useEffect(()=> {
     loaddata();
+    loadReviewData();
 
 },[searchText])
 
   async function loaddata() {
     setListings(null)
     isLoading(true)
-    const postRef = await firebase.firestore().collection("route").get()
+    const postRef = await firebase.firestore().collection("route").orderBy("date", "asc").get()
     setListings(postRef.docs.map((doc)=>({id: doc.id, data: doc.data()})))
     let data =[]
+    // const rateRef= await firebase.firestore().collection('reviews').where('owener' , '===' , listings.data.owner)
+    // reatRef.forEach(doc=>{
+
+    // })
     
     if(searchText!==null || searchText!==""){
     postRef.forEach(doc => {
-          if(String(doc.data().where).toLowerCase().startsWith(String(searchText).toLowerCase())){
+          if(String(doc.data().where.label).toLowerCase().startsWith(String(searchText).toLowerCase())){
             data.push({id: doc.id, data: doc.data()})
           }
         })
@@ -53,16 +92,18 @@ function PassengerDashboard({navigation}) {
 
   }
 
+
+
  
 
   return (
     <Screen style={styles.screen}>
       <View>
 
-      <View style={{flexDirection: "row", alignItems: "center"}} >
-      <AppTextInput  defaultValue={searchText} ct = {true} width="85%" otherStyle={{backgroundColor: colors.light  }} onChangeText={text => setSearchText(text)} placeholder = "Search Here"/>
+      <View style={{flexDirection: "row", alignItems: "center", marginLeft:-30}} >
+      <AppTextInput  defaultValue={searchText} ct = {true} width="80%" otherStyle={{backgroundColor: colors.light}} onChangeText={text => setSearchText(text)} placeholder = "Where to go "/>
       {/* <MaterialCommunityIcons name="check-circle" size={45} color={colors.secondary} onPress={()=>loaddata()}  /> */}
-      <MaterialCommunityIcons name={searchText==""?"search-web":"close-circle"} size={40} color={colors.primary} onPress={()=>{clearSearch()}}/>
+      <MaterialCommunityIcons style={{marginLeft:-10}} name={searchText==""?"search-web":"close-circle"} size={30} color={colors.primary} onPress={()=>{clearSearch()}}/>
       </View>
       {
         loading && <Image style = {styles.loading} source={require('../assets/loading.gif')}  />
@@ -73,14 +114,13 @@ function PassengerDashboard({navigation}) {
         renderItem={({ item }) => (
           
           <Card
-            from={item.data.from}
-            where={item.data.where}
+            isApproved={item.data.isApproved}
+            from={item.data.from.label}
+            where={item.data.where.label}
             seats={item.data.seats}
-            date= {item.data.date}
+            date= {item.data.date.seconds}
             total={item.data.totalEx}
-            
-            
-            onPress={()=> navigation.navigate("Driver Profile", item)}
+            onPress1={()=> navigation.navigate("Driver Profile", item)}
           />
           )}
           />

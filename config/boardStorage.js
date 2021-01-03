@@ -1,6 +1,6 @@
 import * as SecureStore from "expo-secure-store";
 
-const key = "authToken";
+const key = "boardToken";
 
 const storeToken = async (authToken) => {
   try {
@@ -28,20 +28,4 @@ const removeToken = async () => {
   }
 };
 
-const storeBoard = async (first) => {
-  try {
-    await SecureStore.setItemAsync("board", first);
-  } catch (error) {
-    console.log("Error storing the auth token", error);
-  }
-};
-
-const getBoard = async () => {
-  try {
-    return await SecureStore.getItemAsync("board");
-  } catch (error) {
-    console.log("Error getting the auth token", error);
-  }
-};
-
-export default { getToken, removeToken, storeToken, storeBoard, getBoard };
+export default { getToken, removeToken, storeToken };

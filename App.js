@@ -1,24 +1,12 @@
 import { StatusBar } from "expo-status-bar";
-import React, {useState} from "react";
-
+import React, {useEffect, useRef, useState} from "react";
 import {createStackNavigator} from '@react-navigation/stack';
 import {NavigationContainer} from '@react-navigation/native';
 import {createDrawerNavigator} from '@react-navigation/drawer';
-
-//import preLogin from './screens/preLogin';
 import Home from './screens/home';
 import Login from './screens/login';
 import {DrawerContent} from './screens/Navigation/DrawerContent';
-
-
-/*import AppTextInput from './components/AppTextInput';
-import AppButton from './components/AppButton';
-import Register from './screens/Register';
-import Profile from './screens/profile';*/
-
 import * as firebase from 'firebase';
-
-
 import 'firebase/firestore'
 import {
   StyleSheet,
@@ -28,30 +16,24 @@ import {
   TextInput,
   LogBox,
 } from "react-native";
-/*import PreLogin from "./screens/preLogin";
-import forgotpassword2 from "./screens/forgotpassword2";
-import newPassword from "./screens/newPassword";
-import Psignup from './screens/psignup';
-import DriverSignup from "./screens/driverSignup";
 
-import ImgHeader from './components/ImgHeader';
-import CreateRoute from './screens/createRoute'
-import dashboard from "./screens/dashboard";*/
-//import Search from "./screens/search";
 import Register from './screens/Register';
 import { AppLoading, registerRootComponent } from "expo";
-import  MyStack from "./screens/Navigation/AppNavigator";
+import  AppNavigator from "./screens/Navigation/AppNavigator";
 import NavigationAuth from "./screens/Navigation/NavigationAuth";
 import DriverDashboard from "./screens/DriverDashboard";
 import AuthContext from "./config/context";
 import storage from "./config/storage";
 
 import    MapScreen from './screens/MapScreen';
-//import Profile from "./screens/profile";
 import PasSearch from './screens/PasSearch';
 import Profile from "./screens/EditProfile";
 import TabBar from "./screens/Navigation/TabBar";
 import RouteNavigation from './screens/Navigation/RouteNavigation';
+import { navigationRef } from "./screens/Navigation/rootNavigation";
+import navigation from "./screens/Navigation/rootNavigation";
+import {Notifications} from "expo"
+
 
 LogBox.ignoreAllLogs();
 
@@ -72,8 +54,10 @@ if (!firebase.apps.length) {
 
 
 export default function app() {
-  
-  
+  if(storage.getBoard() === false){
+    setFirst(false)
+  }
+  const [first, setFirst] = useState(storage.getBoard())
   const [isReady,setIsReady]=useState(false)
 
   const [user,setUser]=useState(firebase.auth().currentUser)
@@ -101,22 +85,36 @@ export default function app() {
       console.log(error)
     }
   }
+  
+
+
+  useEffect(() => {
+
+   
+
+    Notifications.addListener(response => {
+      console.log(response)
+      if(response.origin === 'selected'){
+      navigation.naviagte("myRide")
+    }
+        });
+
+ 
+  }, []);
 
   if(!isReady){ 
     return <AppLoading startAsync={restoreToken} onFinish={()=>setIsReady(true)} />
   }
   
   return (
-    <AuthContext.Provider value = {{userDetails, setUserDetails}}>
-   <NavigationContainer>
+    <AuthContext.Provider value = {{userDetails, setUserDetails, first, setFirst}}>
+   <NavigationContainer ref ={navigationRef}>
       
+     {userDetails? <AppNavigator/>  :<NavigationAuth/>}  
     
-    {userDetails? <MyStack/>  :<NavigationAuth/>}
-
-     
+   {/* <MapScreen /> */}
    </NavigationContainer>
    </AuthContext.Provider>
-   
    
   
    

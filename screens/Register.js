@@ -1,5 +1,5 @@
 import React, { useState,useContext } from "react";
-import { StyleSheet, Switch, ImageBackground, View, Alert } from "react-native";
+import { StyleSheet, Switch, ImageBackground, View, Alert,KeyboardAvoidingView,ScrollView } from "react-native";
 import * as Yup from "yup";
 import * as firebase from "firebase"
 import 'firebase/firestore';
@@ -15,6 +15,8 @@ import {
 } from "../components/forms";
 import AppText from '../components/AppText';
 import FormImagePicker from '../components/forms/FormImagePicker';
+import storage from "../config/storage";
+import { yupToFormErrors } from "formik";
 
 
 
@@ -28,8 +30,8 @@ const validationSchema = Yup.object().shape({
   email: Yup.string().required().email().label("Email"),
   password: Yup.string().required().min(4).label("Password"),
   contact: Yup.string().required().max(11, "Please Enter a valid Phone Number").min(11,"Please Enter a valid Phone Number").label("Contact"),
-  cnic:Yup.string().required().min(13).label("CNIC"),
-  
+  cnic:Yup.string().required().min(13).max(13).label("CNIC"),
+  LicenseNo: Yup.string().required().min(9).max(9),
   images: Yup.array().max(1)
 
 });
@@ -86,6 +88,7 @@ function Register({navigation}) {
   });
     values.uid = firebase.auth().currentUser.uid
     values.isDriver = isEnabled
+    values.isApproved= false
     
     console.log(values)
     navigation.goBack();
@@ -96,6 +99,8 @@ function Register({navigation}) {
     const snapshot = await userRef.where('email', '==', values.email ).get()
     if (snapshot.empty) {
       firebase.firestore().collection('user').add(values)
+      storage.storeBoard(false)
+    
     }
     else {
       console.log("Already Registered")
@@ -106,17 +111,23 @@ function Register({navigation}) {
 
 
   return (
-   
+   <ScrollView>
     <Screen style={styles.container}>
+          <KeyboardAvoidingView>
         <View style={styles.input}>
+
+
 
         
       <Form
-        initialValues={{ name: "", email: "", password: "", VehicleNo: "", contact: "", cnic:"" , image:[], LicesneNo:""}}
+        initialValues={{ name: "", email: "", password: "", VehicleNo: "", contact: "", cnic:"" , image:[], LicenseNo:""}}
         onSubmit={(values) => handleSubmit(values)}
         validationSchema={validationSchema}
         >
+          <View style={styles.pic}>
+
           <FormImagePicker name='image'/>
+          </View>
         <FormField
           autoCorrect={false}
           icon="account"
@@ -134,6 +145,7 @@ function Register({navigation}) {
           />
         <FormField
         keyboardType="number-pad"
+        icon="id-card"
         name="cnic"
         placeholder="CNIC"
         />
@@ -144,7 +156,7 @@ function Register({navigation}) {
           keyboardType="number-pad"
           name="contact"
           placeholder="Mobile Number"
-        />
+          />
         
         <FormField
           autoCapitalize="none"
@@ -154,16 +166,17 @@ function Register({navigation}) {
           placeholder="Password"
           secureTextEntry
           textContentType="password"
-        />
+          />
         {isEnabled && <FormField
           autoCorrect={false}
-          icon="map-marker"
+          icon="car"
           name="VehicleNo"
           placeholder="Vehicle No"
-        /> }
+          /> } 
         {isEnabled && <FormField
           autoCorrect={false}
-          icon="map-marker"
+          
+          icon="license"
           name="LicenseNo"
           placeholder="License No"
         /> }
@@ -176,13 +189,17 @@ function Register({navigation}) {
             //ios_backgroundColor="#3e3e3e"
             onValueChange={toggleSwitch}
             value={isEnabled}
-          />
+            />
         </View>
-         
+
+        <View style={{right:-180}}>
         <SubmitButton title="Register" />
+          </View> 
       </Form>
             </View>
+            </KeyboardAvoidingView>
     </Screen>
+   </ScrollView>
   );
 }
 
@@ -194,15 +211,10 @@ const styles = StyleSheet.create({
     
    
   },
-  input:{
-    
-    marginLeft:70
-
+  pic:{
+    marginLeft:100
   },
-  background: {
-    flex: 1,
-
-  },
+ 
 });
 
 

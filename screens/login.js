@@ -18,7 +18,10 @@ import {
   TextInput,
   Image,
   ImageBackground,
-  Modal
+  Modal,
+  KeyboardAvoidingView,
+  ScrollView,
+  Keyboard
 } from "react-native";
 import AppButton from "../components/AppButton";
 import ErrorAlert from '../components/errorAlert';
@@ -47,7 +50,7 @@ export default function login({navigation}) {
       return
     }
     else {
-      alert("Ok")
+      console.log("Ok")
     }
     const userRef = firebase.firestore().collection("user")
     const snapshot = await userRef.where('email', '==', email ).get()
@@ -90,43 +93,51 @@ export default function login({navigation}) {
   }
       
   return (
+    <ScrollView>
+
+      <KeyboardAvoidingView>
     <View style={styles.container}>
       <Image
       style={styles.img}
       source={require("../assets/logo.png")}
       />
+
       <Formik
       initialValues={ {email:'' , password:''}}
       onSubmit = { (values) => loginUser(values)}
       validationSchema={validationSchema}
       >
          {({handleChange , handleSubmit , errors , setFieldTouched , touched})  =>(
-        <>
+           <>
          <AppTextInput
       autoCapitalize="none"
       name = 'email'
-      keyboradType="email-address"
+      keyboardType="email-address"
       autoCorrect={false}
-      keyboradType="default"
+      textContentType="emailAddress"
       onBlur = {()=> setFieldTouched("email")}
-      placeholder="Phone or Login" icon="email"
+      placeholder="Email Address" icon="email"
       textContentType='emailAddress'
       onChangeText={handleChange('email')}
-       />
+      />
        <ErrorAlert error={errors.email} visible={touched.email}/>
       <AppTextInput 
       autoCapitalize="none"
       autoCorrect={false}
       name = 'password'
-
+      
       onBlur={()=> setFieldTouched("password")}
       secureTextEntry={true}
       textContentType="password" 
       placeholder="Password" icon="lock"
       onChangeText={handleChange('password')} />
      <ErrorAlert error={errors.password} visible={touched.password}/>
+     <View
+     style={{right:-200}}
+     >
 
-      <AppButton style={{backgroundColor:'black'}} title="Login" onPress={handleSubmit}/>
+      <SubmitButton title="Login" />
+     </View>
      
         </>
       )
@@ -137,8 +148,8 @@ export default function login({navigation}) {
 
       <TouchableOpacity style={{marginTop:10,}} onPress={()=>{setOpen(true)}}
       ><Text
-      style={{color:"blue"}}>
-        Forgot PAssword?
+      style={{color:"blue", right:-250}}>
+        Forgot Password?
       </Text>
       </TouchableOpacity>
       <Modal
@@ -147,19 +158,23 @@ export default function login({navigation}) {
               <AppForm
               initialValues={{email:''}}
               onSubmit={(values)=>forgetPassword(values)}
-                >
+              >
             <AppTextInput 
             placeholder='Email'
             name='email'
             autoCapitalize='none'
-
+            
             />
-            <SubmitButton style={styles.btn} title='Confirm' opPress={()=> {setOpen(false)}}/>
+            
+            <SubmitButton title='Confirm' opPress={()=> {setOpen(false)}}/>
+           
             </AppForm>
         </View>
       </Modal>
+</View>
+</KeyboardAvoidingView>
+</ScrollView>
       
-    </View>
   );
 }
 
@@ -167,7 +182,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
-    alignItems: "center",
+    
     backgroundColor: colors.light
   },
   img: {

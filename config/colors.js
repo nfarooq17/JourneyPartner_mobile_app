@@ -7,5 +7,6 @@ export default {
   light: "#f8f4f4",
   dark: "#0c0c0c",
   danger: "#ff5252",
-  yellow: "#FFD300"
+  yellow: "#FFD300",
+  green:'#1E5254'
 };

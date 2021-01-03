@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useContext } from "react";
 import { View, StyleSheet, Image,TouchableWithoutFeedback } from "react-native";
 import {MaterialCommunityIcons} from '@expo/vector-icons'
 
@@ -8,22 +8,51 @@ import {MaterialCommunityIcons} from '@expo/vector-icons'
 import AppText from "./AppText";
 import colors from "../config/colors";
 import AppButton from "./AppButton";
+import { Rating } from "react-native-ratings";
+import AuthContext from "../config/context";
 
-function Card({ name ,from,where, seats, date , feedStyle, total,onPress,contact }) {
+function Card({ name ,from,where, seats, date , feedStyle, total,onPress, onPress1,contact, vehicleName,vehicleColor, stars, isApproved , isAccepted}) {
+   const authContext =useContext(AuthContext)
+  function getDate(time){
+    console.log(time)
+    let date = new Date(time*1000)
+
+    return date.toLocaleDateString() 
+}
   
   return (
     <View style={[styles.card, feedStyle]}>
       <View style={styles.detailsContainer}>
-      
-        <AppText style={styles.title}>From: {from}</AppText>
+       <View style={{flexDirection:'row'}}>
+         {from &&<AppText style={styles.title}>From: {from}</AppText>}
+         {isApproved && <AppText style={{marginLeft:150 , fontWeight:'bold', color:colors.green }} >Verified </AppText>}
+         </View> 
         <AppText style={styles.title}>to</AppText>
-        <AppText style={styles.title}>Where: {where}</AppText>
-        <AppText style={styles.title}>Available Seats: {seats}</AppText>
-        <AppText style={styles.title} >Departure date: {date}</AppText>
-        <AppText style={styles.title}>Total Expenses{ total}</AppText>
-        <AppText style={styles.title}>{name}</AppText>
-        <AppText style={styles.title}>{contact}</AppText>
-        <AppButton title='Book' onPress={onPress}/>
+        {where && <AppText style={styles.title}>Where: {where}</AppText>}
+       {seats && <AppText style={styles.title}>Available Seats: {seats}</AppText>}
+        {date && <AppText style={styles.title} >Departure date: {getDate(date)}</AppText>}
+       {total && <AppText style={styles.title}>Total Expenses: { total}</AppText>}
+        {vehicleColor && <AppText style={styles.title}>Vehicle Color: {vehicleColor}</AppText>}
+       
+        {vehicleName && <AppText style={styles.title}>Vehicle Name: {vehicleName}</AppText>}
+       {name &&  <AppText style={styles.title}>{name}</AppText>}
+        {contact && <AppText style={styles.title}>{contact}</AppText>}
+       {stars && <Rating
+            startingValue = {stars}
+            fractions = {1}
+            imageSize ={20}
+            readonly ={true}
+            
+            />}
+
+<View style={{flexDirection:'row'}}>
+
+       {onPress1 && <AppButton title='Book' onPress={onPress1}/>}
+       {onPress && <AppButton  title='Maessage' onPress={onPress}/>}
+       <AppButton  title='Start' onPress={onPress}/>
+
+</View>
+
         
        
         

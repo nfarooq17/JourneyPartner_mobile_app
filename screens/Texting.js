@@ -1,5 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { FlatList, StyleSheet, View } from "react-native";
+import * as firebase from "firebase"
+import 'firebase/firestore';
 
 import Screen from "../components/Screen";
 import {
@@ -7,25 +9,44 @@ import {
   ListItemDeleteAction,
   ListItemSeparator,
 } from "../components/lists";
+import AuthContext from "../config/context";
 
 const initialMessages = [
   {
     id: 1,
-    title: "T1",
-    description: "D1",
+    title: "Nashit",
+    description: "hey",
     image: 'https://picsum.photos/200/300'
   },
   {
     id: 2,
-    title: "T2",
-    description: "D2",
+    title: "Abdullah",
+    description: "Hello bro",
     image: 'https://picsum.photos/200/300'
   },
 ];
 
-function Texting(props) {
+function Texting({navigation}) {
   const [messages, setMessages] = useState(initialMessages);
   const [refreshing, setRefreshing] = useState(false);
+  const [listings , setListings ] = useState();
+  const [Loading , isLoading] = useState();
+  const authContext = useContext(AuthContext)
+  async function loaddata() {
+    setListings(null)
+    isLoading(true)
+    const postRef = await firebase.firestore().collection("user").where('uid',"!=",authContext.userDetails.uid).get()
+    setListings(postRef.docs.map((doc)=>({id: doc.id, data: doc.data()})))
+    let data =[]
+
+       isLoading(false)
+   
+  }
+  useEffect(()=> {
+    loaddata();
+    
+  },[])
+
 
   const handleDelete = (message) => {
     // Delete the message from messages
@@ -35,17 +56,17 @@ function Texting(props) {
   return (
     <Screen>
       <FlatList
-        data={messages}
-        keyExtractor={(message) => message.id.toString()}
+        data={listings}
+        keyExtractor={(listings) => listings.id.toString()}
         renderItem={({ item }) => (
           <ListItem
-            title={item.title}
-            subTitle={item.description}
+            title={item.data.name}
+            subTitle={item.data.email}
             chevron
             image={item.image}
-            onPress={() => console.log("Message selected", item)}
+            onPress={() => navigation.navigate('indTexting',item)}  
             renderRightActions={() => (
-              <ListItemDeleteAction onPress={() => handleDelete(item)} />
+              <ListItemDeleteAction onPress={() => navigation.navigate('indTexting',item)} />
             )}
           />
         )}

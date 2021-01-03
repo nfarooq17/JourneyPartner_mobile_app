@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { StyleSheet } from "react-native";
+import { KeyboardAvoidingView, StyleSheet } from "react-native";
 import * as Yup from "yup";
 import * as Location from 'expo-location'
 import * as firebase from "firebase"
@@ -17,6 +17,7 @@ import Screen from "../components/Screen";
 //import useLocation from "../hooks/useLocation";
 import AuthContext from "../config/context";
 import authStorage from '../config/storage'
+import { ScrollView } from "react-native-gesture-handler";
 
 
 const validationSchema = Yup.object().shape({
@@ -104,6 +105,10 @@ async function storeUser (email) {
 }
 
   return (
+    <ScrollView>
+      <KeyboardAvoidingView>
+
+
     <Screen style={styles.container}>
       <Form
         initialValues={{ image:[authContext.userDetails.image], name: authContext.userDetails.name, email: authContext.userDetails.email, address: isEnabled? authContext.userDetails.address : "", contact: authContext.userDetails.contact }}
@@ -137,7 +142,7 @@ async function storeUser (email) {
           name="contact"
           defaultValue = {authContext.userDetails.contact}
           placeholder="Mobile Number"
-        />
+          />
         
 
         {isEnabled && <FormField
@@ -145,11 +150,13 @@ async function storeUser (email) {
           icon="map-marker"
           name="address"
           placeholder="Address"
-        />}
+          />}
 
         <SubmitButton title="Update & Save"  />
       </Form>
     </Screen>
+          </KeyboardAvoidingView>
+</ScrollView>
   );
 }
 

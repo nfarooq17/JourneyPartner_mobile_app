@@ -1,4 +1,4 @@
-import React,{useContext} from 'react';
+import React,{useContext, useEffect} from 'react';
 
 import {createMaterialBottomTabNavigator} from '@react-navigation/material-bottom-tabs';
 import {createStackNavigator} from '@react-navigation/stack';
@@ -8,11 +8,11 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 
 import DriverDashboard from '../DriverDashboard';
 import PassengerDashboard from '../passengerDashboard';
-// import NotificationScreen from './NotificationScreen';
-// import ExploreScreen from './ExploreScreen';
+
 import Profile from '../profile';
-// import MapTestScreen from './MapTestScreen';
+
 import EditProfile from '../EditProfile';
+import Notification from '../notification';
 
 
 import {useTheme, Avatar} from 'react-native-paper';
@@ -26,6 +26,12 @@ import Texting from '../Texting';
 import AuthContext from '../../config/context';
 import DriverDetails from '../DriverDetails';
 import RideDetails from '../rideDetails';
+import Route from '../route';
+import * as Notifications from 'expo-notifications'
+import DriverNotification from '../driverNotification';
+import indTexting from '../indTexting';
+
+
 
 
 const HomeStack = createStackNavigator();
@@ -33,11 +39,13 @@ const RideStack = createStackNavigator();
 const NotificationStack = createStackNavigator();
 const ProfileStack = createStackNavigator();
 const VendorsStack = createStackNavigator();
+const TextingNavigator = createStackNavigator();
 
 
 const Tab = createMaterialBottomTabNavigator();
 
 const TabBar = () => (
+  
   
   <Tab.Navigator 
   screenOptions={{
@@ -53,8 +61,8 @@ const TabBar = () => (
     component={HomeStackScreen}
     options={{
       tabBarLabel: 'Home',
-      tabBarColor: '#000',
-      activeBackgroundColor:'#000',
+      tabBarColor: '#1E5254',
+      activeBackgroundColor:'#1E5254',
       tabBarIcon: ({color}) => (
         <Icon name="ios-home" color={color} size={26} />
       ),
@@ -62,12 +70,14 @@ const TabBar = () => (
     }}
   />
   <Tab.Screen
-    name="hello"
-    component={Texting}
+    name="indTexting"
+    headerShowen={false}
+    component={texting}
     options={{
-      tabBarLabel: 'Home',
-      activeBackgroundColor:'#000',
-      tabBarColor: '#000',
+      
+      tabBarLabel: 'Text',
+      activeBackgroundColor:'#1E5254',
+      tabBarColor: '#1E5254',
       tabBarIcon: ({color}) => (
         <Icon name="ios-text" color={color} size={26} />
       ),
@@ -75,12 +85,12 @@ const TabBar = () => (
     }}
   />
   <Tab.Screen
-    name="Vendors"
-    component={Profile}
+    name="Notification"
+    component={Notification}
     options={{
-      tabBarLabel: 'Profile',
-      tabBarColor: '#000',
-      activeBackgroundColor:'#000',
+      tabBarLabel: 'Notification',
+      tabBarColor: '#1E5254',
+      activeBackgroundColor:'#1E5254',
       tabBarIcon: ({color}) => (
         <Icon name="ios-notifications" color={color} size={26} />
       ),
@@ -92,8 +102,8 @@ const TabBar = () => (
     component={ProfileStackScreen}
     options={{
       tabBarLabel: 'Profile',
-      tabBarColor: '#000',
-      activeBackgroundColor:'#000',
+      tabBarColor: '#1E5254',
+      activeBackgroundColor:'#1E5254',
       tabBarIcon: ({color}) => (
         <Icon name="ios-person" color={color} size={26} />
       ),
@@ -124,7 +134,47 @@ const HomeStackScreen = ({navigation}) => {
           fontWeight: 'bold',
         },
       }}>
-     {authContext.userDetails.isDriver&&
+     {!authContext.userDetails.isApproved && authContext.userDetails.isApproved &&authContext.userDetails.isDriver&&
+     <HomeStack.Screen
+     name="DriverDashboard"
+     component={DriverNotification}
+     options={{
+          headerShowen:false,
+          title: 'Home',
+          headerLeft: () => (
+            <View style={{marginLeft: 10}}>
+              <Icon.Button
+                name="ios-menu"
+                size={25}
+                color={colors.text}
+                backgroundColor={colors.background}
+                onPress={() => navigation.openDrawer()}
+                
+              />
+            </View>
+          ),
+          headerRight: () => (
+            <View style={{flexDirection: 'row', marginRight: 10}}>
+            
+              <TouchableOpacity
+                style={{paddingHorizontal: 10, marginTop: 5}}
+                onPress={() => {
+                  navigation.navigate('Profile');
+                }}>
+                <Avatar.Image
+                  source={{
+                    uri:
+                    authContext.userDetails.image,
+                  }}
+                  size={30}
+                  />
+              </TouchableOpacity>
+            </View>
+          ),
+        }}
+        />
+      } 
+      {authContext.userDetails.isDriver&&
      <HomeStack.Screen
      name="DriverDashboard"
      component={DriverDashboard}
@@ -165,7 +215,7 @@ const HomeStackScreen = ({navigation}) => {
         />
       } 
       <HomeStack.Screen
-        name="Driver"
+        name="PassengerDashboard"
         component={PassengerDashboard}
         options={{
           headerShowen:false,
@@ -193,7 +243,7 @@ const HomeStackScreen = ({navigation}) => {
                 <Avatar.Image
                   source={{
                     uri:
-                      authContext.userDetails.Image
+                      authContext.userDetails.image
                   }}
                   size={30}
                 />
@@ -206,6 +256,9 @@ const HomeStackScreen = ({navigation}) => {
      <HomeStack.Screen
         name="createRoute"
         component={createRoute}/>
+        <HomeStack.Screen
+        name="Route"
+        component={Route}/>
          <HomeStack.Screen
         name="Driver Profile"
         component={DriverDetails}/>
@@ -227,127 +280,28 @@ const RideStackScreen=({navigation})=>{
      <RideStack.Navigator
      
      >
-     <HomeStack.Screen
+     <RideStack.Screen
      name="myRide"
      component={myRide}/>
-  <HomeStack.Screen
+  <RideStack.Screen
   name="Ride Details"
   component={RideDetails}/>
   </RideStack.Navigator>
 ); 
 }
 
-/*const VendorsStackScreen = ({navigation}) => {
-  const {colors} = useTheme();
-
-  return (
-    <VendorsStack.Navigator
-      screenOptions={{
-        headerStyle: {
-          backgroundColor: colors.background,
-          shadowColor: colors.background, // iOS
-          elevation: 0, // Android
-        },
-        headerTintColor: colors.text,
-      }}>
-      <VendorsStack.Screen
-        name="CardListScreen"
-        component={CardListScreen}
-        options={{
-          title: 'Vendor Category',
-          headerLeft: () => (
-            <View style={{marginLeft: 10}}>
-              <Icon.Button
-                name="ios-menu"
-                size={25}
-                backgroundColor={colors.background}
-                color={colors.text}
-                onPress={() => navigation.openDrawer()}
-              />
-            </View>
-          ),
-          
-        }}
-      />
-
-      <VendorsStack.Screen 
-        name="VendorsOfSpecificCategory"
-        component={VendorsOfSpecificCategory}
-        options={({route}) => ({
-          title: 'Vendors',
-          headerBackTitleVisible: false,
-          // headerTitle: false,
-          // headerTransparent: true,
-          headerTintColor: '#000000'
-        })}
-      />
-      <VendorsStack.Screen 
-        name="CardItemDetails"
-        component={CardItemDetails}
-        options={({route}) => ({
-          // title: route.params.title,
-          headerBackTitleVisible: false,
-          headerTitle: false,
-          headerTransparent: true,
-          headerTintColor: '#fff'
-        })}
-      />
-      
-    </VendorsStack.Navigator>
-  );
-};
-*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// const NotificationStackScreen = ({navigation}) => (
-//   <NotificationStack.Navigator
-//     screenOptions={{
-//       headerStyle: {
-//         backgroundColor: '#1f65ff',
-//       },
-//       headerTintColor: '#fff',
-//       headerTitleStyle: {
-//         fontWeight: 'bold',
-//       },
-//     }}>
-//     <NotificationStack.Screen
-//       name="Notifications"
-//       component={NotificationScreen}
-//       options={{
-//         headerLeft: () => (
-//           <Icon.Button
-//             name="ios-menu"
-//             size={25}
-//             backgroundColor="#1f65ff"
-//             onPress={() => navigation.openDrawer()}
-//           />
-//         ),
-//       }}
-//     />
-//   </NotificationStack.Navigator>
-// );
 
 const ProfileStackScreen = ({navigation}) => {
   const {colors} = useTheme();
+
+  useEffect(()=>{
+
+    Notifications.addNotificationResponseReceivedListener((notification) => {
+        navigation.naviagte("Profile")
+        console.log(notification)
+    })
+},[])
+
 
   return (
     <ProfileStack.Navigator
@@ -375,17 +329,7 @@ const ProfileStackScreen = ({navigation}) => {
               />
             </View>
           ),
-          // headerRight: () => (
-          //   <View style={{marginRight: 10}}>
-          //     <MaterialCommunityIcons.Button
-          //       name="account-edit"
-          //       size={25}
-          //       backgroundColor={colors.background}
-          //       color={colors.text}
-          //       onPress={() => navigation.navigate('EditProfile')}
-          //     />
-          //   </View>
-          // ),
+        
         }}
       />
       <ProfileStack.Screen
@@ -398,6 +342,44 @@ const ProfileStackScreen = ({navigation}) => {
     </ProfileStack.Navigator>
   );
 };
+const texting = ({navigation}) => {
+  const {colors} = useTheme();
+
+
+
+  return (
+    <TextingNavigator.Navigator
+    
+      screenOptions={{
+  
+        headerStyle: {
+          backgroundColor: colors.background,
+          shadowColor: colors.background, // iOS
+          elevation: 0, // Android
+        },
+        headerTintColor: colors.text,
+      }}>
+      <TextingNavigator.Screen
+      headerShowen={false}
+        name="Texting"
+        component={Texting}
+        // options={{
+        //   title: 'Profile Screen',
+        // }}
+      />
+      <TextingNavigator.Screen
+      headerShowen={false}
+        name="indTexting"
+        // options={{
+        //   title: 'Edit Profile',
+        // }}
+        component={indTexting}
+      />
+    </TextingNavigator.Navigator>
+  );
+};
+
+
 
 
 

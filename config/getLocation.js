@@ -4,12 +4,11 @@ import * as Location from 'expo-location'
 export default getLocation = () => {
     const [location, setLocation]= useState();
 
-
     const getLocation = async () => {
         try {
             const {granted} = await Location.requestPermissionsAsync();
             if(!granted) return;
-            const {coords: {latitude, longitude}}= await Location.getCurrentPositionAsync()
+            const {coords: {latitude, longitude}}= await Location.getLastKnownPositionAsync()
 
             setLocation({latitude,longitude})
             
