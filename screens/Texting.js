@@ -61,9 +61,10 @@ function Texting({navigation}) {
         renderItem={({ item }) => (
           <ListItem
             title={item.data.name}
-            subTitle={item.data.email}
+            title1={item.data.name}
+            
             chevron
-            image={item.image}
+            image={item.data.image}
             onPress={() => navigation.navigate('indTexting',item)}  
             renderRightActions={() => (
               <ListItemDeleteAction onPress={() => navigation.navigate('indTexting',item)} />

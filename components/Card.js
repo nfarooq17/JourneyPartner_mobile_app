@@ -11,7 +11,7 @@ import AppButton from "./AppButton";
 import { Rating } from "react-native-ratings";
 import AuthContext from "../config/context";
 
-function Card({ name ,from,where, seats, date , feedStyle, total,onPress, onPress1,contact, vehicleName,vehicleColor, stars, isApproved , isAccepted}) {
+function Card({ name ,from,where, seats, date , feedStyle, total,onPress, onPress1 , onPress2,contact, vehicleName,vehicleColor, stars, isApproved , isAccepted}) {
    const authContext =useContext(AuthContext)
   function getDate(time){
     console.log(time)
@@ -47,9 +47,9 @@ function Card({ name ,from,where, seats, date , feedStyle, total,onPress, onPres
 
 <View style={{flexDirection:'row'}}>
 
+       {onPress2 && <AppButton  title='Start' onPress={onPress2}/>}
        {onPress1 && <AppButton title='Book' onPress={onPress1}/>}
        {onPress && <AppButton  title='Maessage' onPress={onPress}/>}
-       <AppButton  title='Start' onPress={onPress}/>
 
 </View>
 

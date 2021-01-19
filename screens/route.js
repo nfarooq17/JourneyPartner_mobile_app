@@ -64,7 +64,7 @@ function Route({navigation}) {
             seats={item.data.seats}
             date= {item.data.date.seconds}
             total={item.data.totalEx}  
-            
+            onPress2={()=> {navigation.navigate('MapScreen' ,item)}}
           />
           )}
           />

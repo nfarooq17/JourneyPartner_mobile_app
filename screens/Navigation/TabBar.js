@@ -30,6 +30,7 @@ import Route from '../route';
 import * as Notifications from 'expo-notifications'
 import DriverNotification from '../driverNotification';
 import indTexting from '../indTexting';
+import MapScreen from '../MapScreen';
 
 
 
@@ -40,6 +41,7 @@ const NotificationStack = createStackNavigator();
 const ProfileStack = createStackNavigator();
 const VendorsStack = createStackNavigator();
 const TextingNavigator = createStackNavigator();
+const TrackingStack = createStackNavigator();
 
 
 const Tab = createMaterialBottomTabNavigator();
@@ -260,11 +262,14 @@ const HomeStackScreen = ({navigation}) => {
         name="Route"
         component={Route}/>
          <HomeStack.Screen
+        name="MapScreen"
+        
+        component={MapScreen}
+ />
+ 
+         <HomeStack.Screen
         name="Driver Profile"
         component={DriverDetails}/>
-        <HomeStack.Screen
-        name="PassSearch"
-        component={PasSearch}/>
         <HomeStack.Screen
         name="myRide"
         component={RideStackScreen}/>
@@ -376,6 +381,33 @@ const texting = ({navigation}) => {
         component={indTexting}
       />
     </TextingNavigator.Navigator>
+  );
+};
+
+
+const mapStackScreen = ({navigation}) => {
+  const {colors} = useTheme();
+
+  
+
+
+  return (
+    <TrackingStack.Navigator
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: colors.background,
+          shadowColor: colors.background, // iOS
+          elevation: 0, // Android
+        },
+        headerTintColor: colors.text,
+      }}>
+      <TrackingStack.Screen
+        name="Tracking"
+        component={MapScreen}
+ 
+      />
+
+    </TrackingStack.Navigator>
   );
 };
 

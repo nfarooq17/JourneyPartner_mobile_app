@@ -9,11 +9,6 @@ import { NavigationContainer } from '@react-navigation/native'
 export default function DriverDashboard({navigation}) {
   const authContext = useContext(AuthContext)
   
-
-
-
-    
-
     return (
         <View style={styles.container}>
                 <Image 
